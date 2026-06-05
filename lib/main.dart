@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import 'presentation/pages/Auth/Login.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const DulceAromaApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class DulceAromaApp extends StatelessWidget {
+  const DulceAromaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Dulce Aroma',
+      theme: ThemeData(primarySwatch: Colors.pink),
+      home: const LoginDulce(),
     );
   }
 }
