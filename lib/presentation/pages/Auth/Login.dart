@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../Feature/Home.dart';
 
 class LoginDulce extends StatefulWidget {
-  const LoginDulce({Key? key}) : super(key: key);
+  const LoginDulce({super.key});
 
   @override
   State<LoginDulce> createState() => _LoginDulceState();
@@ -29,19 +29,27 @@ class _LoginDulceState extends State<LoginDulce> {
 
     if (emailController.text.trim() == emailValido &&
         passwordController.text.trim() == passwordValida) {
+      if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 700),
-          pageBuilder: (_, animation, __) => BakeryHomePage(),
+          transitionDuration: const Duration(milliseconds: 800),
+          pageBuilder: (_, animation, __) => const BakeryHomePage(),
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(
               opacity: animation,
               child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1, 0),
-                  end: Offset.zero,
-                ).animate(animation),
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeInOut,
+                      ),
+                    ),
                 child: child,
               ),
             );
@@ -61,9 +69,11 @@ class _LoginDulceState extends State<LoginDulce> {
       );
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -73,32 +83,99 @@ class _LoginDulceState extends State<LoginDulce> {
     super.dispose();
   }
 
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    bool isPassword = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+
+        const SizedBox(height: 8),
+
+        TextField(
+          controller: controller,
+          obscureText: isPassword ? obscurePassword : false,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xFFF8F9FB),
+
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 18,
+            ),
+
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        obscurePassword = !obscurePassword;
+                      });
+                    },
+                  )
+                : null,
+
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(
+                color: loginError ? Colors.red : Colors.grey.shade300,
+              ),
+            ),
+
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: Color(0xFFE91E63)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                height: 70,
-                alignment: Alignment.center,
-                child: const Text(
-                  "Dulce Aroma",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
+              TweenAnimationBuilder(
+                duration: const Duration(milliseconds: 800),
+                tween: Tween<double>(begin: 0, end: 1),
+                builder: (context, value, child) {
+                  return Opacity(opacity: value, child: child);
+                },
+                child: Container(
+                  height: 70,
+                  alignment: Alignment.center,
+                  child: const Text(
+                    "Dulce Aroma",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
 
-              SizedBox(
-                width: double.infinity,
-                height: 190,
-                child: Image.asset(
-                  "assets/images/img3.jpeg",
-                  fit: BoxFit.cover,
+              Hero(
+                tag: "loginBanner",
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 190,
+                  child: Image.asset(
+                    "assets/images/img3.jpeg",
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
 
@@ -130,99 +207,17 @@ class _LoginDulceState extends State<LoginDulce> {
 
                     const SizedBox(height: 35),
 
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Email Address",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    TextField(
+                    buildTextField(
                       controller: emailController,
-                      decoration: InputDecoration(
-                        hintText: "",
-                        filled: true,
-                        fillColor: const Color(0xFFF8F9FB),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 18,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(
-                            color: loginError
-                                ? Colors.red
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE91E63),
-                          ),
-                        ),
-                      ),
+                      label: "Email Address",
                     ),
 
                     const SizedBox(height: 20),
 
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Password",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    TextField(
+                    buildTextField(
                       controller: passwordController,
-                      obscureText: obscurePassword,
-                      decoration: InputDecoration(
-                        hintText: "",
-                        filled: true,
-                        fillColor: const Color(0xFFF8F9FB),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 18,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              obscurePassword = !obscurePassword;
-                            });
-                          },
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(
-                            color: loginError
-                                ? Colors.red
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE91E63),
-                          ),
-                        ),
-                      ),
+                      label: "Password",
+                      isPassword: true,
                     ),
 
                     const SizedBox(height: 8),
@@ -244,61 +239,49 @@ class _LoginDulceState extends State<LoginDulce> {
                     const SizedBox(height: 15),
 
                     TweenAnimationBuilder<double>(
-                      tween: Tween(
-                        begin: 1,
-                        end: isLoading ? 0.95 : 1,
-                      ),
                       duration: const Duration(milliseconds: 250),
+                      tween: Tween(begin: 1, end: isLoading ? 0.95 : 1),
                       builder: (context, scale, child) {
-                        return Transform.scale(
-                          scale: scale,
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: ElevatedButton(
-                              onPressed:
-                                  isLoading ? null : loginUser,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color(0xFFE91E63),
-                                elevation: 8,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(28),
-                                ),
-                              ),
-                              child: AnimatedSwitcher(
-                                duration: const Duration(
-                                  milliseconds: 300,
-                                ),
-                                child: isLoading
-                                    ? const SizedBox(
-                                        key: ValueKey("loading"),
-                                        width: 24,
-                                        height: 24,
-                                        child:
-                                            CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Text(
-                                        "Log In",
-                                        key: ValueKey("text"),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight:
-                                              FontWeight.bold,
-                                        ),
-                                      ),
-                              ),
+                        return Transform.scale(scale: scale, child: child);
+                      },
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 55,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : loginUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFE91E63),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(28),
                             ),
                           ),
-                        );
-                      },
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: isLoading
+                                ? const SizedBox(
+                                    key: ValueKey("loading"),
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    "Log In",
+                                    key: ValueKey("text"),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
                     ),
 
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 20),
 
                     Container(
                       width: double.infinity,
@@ -311,9 +294,7 @@ class _LoginDulceState extends State<LoginDulce> {
                         children: [
                           Text(
                             "Credenciales de prueba",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 5),
                           Text("Correo: admin@dulcearoma.com"),
@@ -324,49 +305,14 @@ class _LoginDulceState extends State<LoginDulce> {
 
                     const SizedBox(height: 25),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(
-                            color: Colors.grey.shade300,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(28),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.g_mobiledata,
-                              size: 28,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Continue with Google",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
                     const SizedBox(height: 30),
 
                     const Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Don't have an account? ",
-                          style: TextStyle(
-                            color: Colors.grey,
-                          ),
+                          style: TextStyle(color: Colors.grey),
                         ),
                         Text(
                           "Create an account",
@@ -387,4 +333,3 @@ class _LoginDulceState extends State<LoginDulce> {
     );
   }
 }
-
