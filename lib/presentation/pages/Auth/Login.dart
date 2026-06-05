@@ -85,14 +85,14 @@ class _LoginDulceState extends State<LoginDulce> {
 
   Widget buildTextField({
     required TextEditingController controller,
-    required String label,
+    String? hint,
     bool isPassword = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          hint ?? "",
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
 
@@ -102,6 +102,7 @@ class _LoginDulceState extends State<LoginDulce> {
           controller: controller,
           obscureText: isPassword ? obscurePassword : false,
           decoration: InputDecoration(
+            hintText: hint,
             filled: true,
             fillColor: const Color(0xFFF8F9FB),
 
@@ -209,14 +210,14 @@ class _LoginDulceState extends State<LoginDulce> {
 
                     buildTextField(
                       controller: emailController,
-                      label: "Email Address",
+                      hint: "Email Address",
                     ),
 
                     const SizedBox(height: 20),
 
                     buildTextField(
                       controller: passwordController,
-                      label: "Password",
+                      hint: "Password",
                       isPassword: true,
                     ),
 
@@ -283,23 +284,43 @@ class _LoginDulceState extends State<LoginDulce> {
 
                     const SizedBox(height: 20),
 
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.pink.shade50,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Column(
-                        children: [
-                          Text(
-                            "Credenciales de prueba",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                    const SizedBox(height: 25),
+
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: Colors.grey.shade300)),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "or",
+                            style: TextStyle(color: Colors.grey),
                           ),
-                          SizedBox(height: 5),
-                          Text("Correo: admin@dulcearoma.com"),
-                          Text("Contraseña: 123456"),
-                        ],
+                        ),
+                        Expanded(child: Divider(color: Colors.grey.shade300)),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: OutlinedButton.icon(
+                        onPressed: () {},
+                        icon: Image.asset("images/img4.png", height: 19),
+                        label: const Text(
+                          "Continue with Google",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
                       ),
                     ),
 
